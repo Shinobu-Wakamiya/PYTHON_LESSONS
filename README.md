@@ -1,3 +1,3 @@
 # PYTHON_LESSONS
 JUST ME LEARNING PYTHON
-Author- Riya
+Author- Riya Verma
