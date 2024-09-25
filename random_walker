@@ -1,0 +1,92 @@
+step_limit = 5000
+reset_time_list = T_values
+num_realizations = 5000
+p_values_list = X_values
+num_sites = 10000
+
+
+def random_walk(step_limit, reset_time_list, X_values, num_realizations):
+    all_displacements = []
+    all_total_times = []
+    long = []
+    pi=[]
+    qi=[]
+    
+    for _ in range(num_realizations):
+        position = num_sites // 2
+        total_time = 0
+        displacement = []
+        total_time_array = []
+        
+
+        while total_time < step_limit:
+            reset_time = int(np.random.choice(reset_time_list))
+
+            for t in range(reset_time):
+                pe = np.random.choice(X_values)
+                while pe>=1:
+                    pe = np.random.choice(X_values)
+                qe = 1-pe
+                pi.append(pe)
+                qi.append(qe)
+                move = np.random.choice([-1,1],p=[pe,qe])
+                position += move
+
+                #Boundary Condition
+                if position < 0:
+                    position = num_sites - 1
+                elif position >= num_sites:
+                    position = 0
+                    
+                displacement.append(abs(position-(num_sites // 2)))
+                # print(displacement)
+                total_time_array.append(total_time+t+1)
+            
+                if total_time+t+1 >= step_limit:
+                    break
+
+            total_time += reset_time
+            long.append(abs(position-(num_sites // 2)))
+            position = num_sites // 2
+            
+
+        all_displacements.append(displacement)
+        all_total_times.append(total_time_array)
+
+#    all_displacements = np.array(all_displacements)
+#    all_total_times = np.array(all_total_times)
+
+    avg_displacement = np.mean(all_displacements, axis=0)
+    avg_total_time = np.mean(all_total_times, axis=0)
+
+    return avg_total_time, avg_displacement, long, pi, qi
+
+
+
+#Lists to store long time displacements fro two diffrent p values
+long_time_displacements_p1 = {}
+
+#plotting setup
+plt.figure(figsize=(10,6))
+
+for i in range(10):
+    avg_total_time, avg_displacement, long, pi, qi = random_walk(step_limit, reset_time_list, X_values, num_realizations)
+
+    long_time_displacements_p1[i] = long
+    
+    plt.plot(avg_total_time, avg_displacement, label=f'realization={i+1}')
+    
+
+
+
+plt.plot(avg_total_time, avg_displacement)
+plt.xlabel('Total Time (Steps)')
+plt.ylabel('Average Displacement')
+plt.title('Total Time Vs Average Dis')
+plt.legend()
+plt.savefig('mean_displacement_new1.png',dpi=300)
+plt.show()
+
+for i in range(10):
+    long_displacement = long_time_displacements_p1[i]
+    print(f'long time displacements for realization ={i+1}: {long_displacement[:10]}')
