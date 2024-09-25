@@ -90,3 +90,58 @@ plt.show()
 for i in range(10):
     long_displacement = long_time_displacements_p1[i]
     print(f'long time displacements for realization ={i+1}: {long_displacement[:10]}')
+
+############################################################################################################
+PART 2
+##############################################################################################################
+ro=0.001
+key_list = list(long_time_displacements_p1.keys())
+
+first_key = key_list[0]
+first_value = long_time_displacements_p1[first_key]
+second_key = key_list[1]
+second_value = long_time_displacements_p1[second_key]
+
+bins = np.linspace(min(min(first_value), min(second_value)), max(max(first_value),max(second_value)), 30)
+pdf1,_ = np.histogram(first_value, bins=bins, density=True)
+pdf2,_ = np.histogram(second_value, bins=bins, density=True)
+
+bin_centers = (bins[:-1]+bins[1:]) / 2
+
+plt.figure(figsize=(8,6))
+
+#data 1
+plt.scatter(bin_centers, pdf1, color='b', label='p = 0.04', alpha=0.6)
+plt.plot(bin_centers, pdf1, color='b', alpha=0.6)
+#data 2
+plt.scatter(bin_centers, pdf2, color='r', label='p = 0.04', alpha=0.6)
+plt.plot(bin_centers, pdf2, color='r', alpha=0.6)
+
+arrp=np.array(pi)
+arrq=np.array(qi)
+
+arrd= arrp/arrq
+di=arrd.tolist()
+average_qp = sum(di)/len(di)
+
+arri=1/arrp
+rri=arri.tolist()
+average_1p = sum(rri)/len(rri)
+
+v=(1-average_qp)/average_1p
+
+def f(y):
+    return (ro * np.exp(-ro*y/v) / v)
+
+y = np.linspace(min(bin_centers),max(bin_centers),1000)
+Py = f(y)
+
+plt.plot(y, Py, label='Py = (ro/v) * exp(-y * (ro/v))' , color='g', linestyle='--', linewidth=2)
+
+plt.xlabel('long time displacement y')
+plt.ylabel('Probability density / f(y)')
+plt.title('for two values of p, probability density vs long time displacemnnt curve')
+plt.legend()
+plt.grid(True)
+plt.savefig('Py_y.png',dpi=300)
+plt.show()
